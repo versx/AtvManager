@@ -1,8 +1,8 @@
 {
-    "name": "discordjs-v14-template-ts",
+    "name": "atvmanager",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "src/index.js",
     "scripts": {
         "start": "cls && node build/index.js",
         "build": "tsc"
@@ -11,14 +11,15 @@
     "author": "MericcaN41",
     "license": "ISC",
     "dependencies": {
+        "@devicefarmer/adbkit": "^3.2.5",
         "@discordjs/rest": "^1.1.0",
         "@types/node": "^18.7.14",
         "chalk": "^4.1.2",
         "discord.js": "14.3.0",
-        "dotenv": "^16.0.2",
-        "mongoose": "^6.5.4"
+        "dotenv": "^16.0.2"
     },
     "devDependencies": {
+        "@types/bluebird": "^3.5.38",
         "typescript": "^4.8.2"
     },
     "overrides": {
