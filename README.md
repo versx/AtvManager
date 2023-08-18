@@ -1,4 +1,4 @@
-# Android ATV Manager
+# Android TV Manager
 
 ## Features
 
