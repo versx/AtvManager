@@ -1,4 +1,4 @@
-# Android TV Manager
+# Android TV Device Manager
 
 ## Features
 
