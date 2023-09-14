@@ -8,7 +8,7 @@ import {
 import { getThemeColor } from '../functions';
 import { SlashCommand } from '../types';
 
-const command : SlashCommand = {
+const command: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName('ping')
     .setDescription('Shows the bot\'s ping')

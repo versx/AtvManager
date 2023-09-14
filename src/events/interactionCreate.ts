@@ -2,7 +2,7 @@ import { Interaction } from 'discord.js';
 
 import { BotEvent } from '../types';
 
-const event : BotEvent = {
+const event: BotEvent = {
   name: 'interactionCreate',
   execute: (interaction: Interaction) => {
     if (interaction.isChatInputCommand()) {
