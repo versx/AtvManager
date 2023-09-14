@@ -24,18 +24,21 @@ const command: Command = {
       devices = [arg];
     }
 
+    let reboots = 0, fails = 0;
     const service = new AndroidDeviceService(devices);
     for (const device of service.devices) {
-      await rebootDevice(device, message);
+      if (await rebootDevice(device, message)) {
+        reboots++;
+      } else {
+        fails++;
+      }
     }
-    //await service.kill();
 
-    if (arg === 'all') {
-      console.log('All devices rebooted successfully.');
-      await message.channel.send('All devices rebooted successfully.');
+    console.log(devices.length, 'devices rebooted successfully.');
+    if (fails > 0) {
+      await message.channel.send(`${reboots} devices rebooted successfully and ${fails} failed.`);
     } else {
-      console.log(devices.length, 'devices rebooted successfully.');
-      await message.channel.send(devices.length + ' devices rebooted successfully.');
+      await message.channel.send(`${reboots} devices rebooted successfully.`);
     }
   },
   permissions: ['Administrator'],
@@ -66,7 +69,7 @@ const rebootDevice = async (device: AndroidDevice, message: Message): Promise<bo
       await message.channel.send(`[${device.deviceId}] Failed to disconnect`);
       result = false;
     }
-    
+
     return result;
   } catch (err: any) {
     console.error('error:', err.message);
