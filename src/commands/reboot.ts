@@ -42,29 +42,36 @@ const command: Command = {
   aliases: [],
 };
 
-const rebootDevice = async (device: AndroidDevice, message: Message) => {
+const rebootDevice = async (device: AndroidDevice, message: Message): Promise<boolean> => {
   try {
     if (!await device.connect()) {
       console.log(`[${device.deviceId}] Connection failed`);
       await message.channel.send(`[${device.deviceId}] Connection failed`);
-      return;
+      return false;
     }
 
+    let result = false;
     if (await device.rebootDevice()) {
       console.log(`[${device.deviceId}] Rebooted successfully.`);
       await message.channel.send(`[${device.deviceId}] Rebooted successfully`);
+      result = true;
     } else {
       console.error(`[${device.deviceId}] Reboot failed.`);
       await message.channel.send(`[${device.deviceId}] Reboot failed`);
+      result = false;
     }
 
     if (!await device.disconnect()) {
       console.log(`[${device.deviceId}] Failed to disconnect`);
       await message.channel.send(`[${device.deviceId}] Failed to disconnect`);
+      result = false;
     }
+    
+    return result;
   } catch (err: any) {
     console.error('error:', err.message);
     await message.channel.send(`[${device.deviceId}] Failed connection`);
+    return false;
   }
 };
 
