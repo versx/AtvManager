@@ -28,8 +28,8 @@ const command: Command = {
 const pullDeviceLog = async (device: AndroidDevice, message: Message) => {
   try {
     if (!await device.connect()) {
-      console.log(`[${device.deviceId}] Connected`);
-      await message.channel.send(`[${device.deviceId}] Connected`);
+      console.log(`[${device.deviceId}] Connection failed`);
+      await message.channel.send(`[${device.deviceId}] Connection failed`);
       return;
     }
 
@@ -48,7 +48,7 @@ const pullDeviceLog = async (device: AndroidDevice, message: Message) => {
       await message.channel.send(`[${device.deviceId}] Failed to disconnect`);
     }
   } catch (err: any) {
-    console.error('error:', err.message);
+    console.error('error:', err);
     await message.channel.send(`[${device.deviceId}] Failed connection`);
   }
 };

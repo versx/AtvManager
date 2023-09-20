@@ -67,8 +67,8 @@ export class AndroidDevice {
   async downloadFile(url: string, destination: string) {
     try {
       const response: any = await fetch(url);
-      if (!existsSync('./static/apks')) {
-        await mkdir('./static/apks');
+      if (!existsSync('../../static/apks')) {
+        await mkdir('../../static/apks');
       }
       const fileStream = createWriteStream(destination, { flags: 'wx' });
       await finished(Readable.fromWeb(response.body).pipe(fileStream));
@@ -80,7 +80,7 @@ export class AndroidDevice {
 
   async installApp(apkName: string = 'pogov7.apk') {
     try {
-      const apk = `./static/apks/${apkName}`;
+      const apk = `../../static/apks/${apkName}`;
       if (!existsSync(apk)) {
         return false;
       }
@@ -129,7 +129,7 @@ export class AndroidDevice {
   async getScreenshot() {
     try {
       const source = BasePath + `/atlas.log`;
-      const destination = path.resolve(__dirname, `./static/screens/${this.deviceHost}.png`);
+      const destination = path.resolve(__dirname, `../../static/screens/${this.deviceHost}.png`);
       const screen = await this.deviceClient.screencap();
       await new Bluebird((resolve, reject) => {
         screen.on('error', reject);
@@ -152,7 +152,7 @@ export class AndroidDevice {
   async getLog() {
     try {
       const source = BasePath + `/atlas.log`;
-      const destination = path.resolve(__dirname, `./static/logs/${this.deviceHost}.log`);
+      const destination = path.resolve(__dirname, `../../static/logs/${this.deviceHost}.log`);
       const transfer = await this.deviceClient.pull(source);
       await new Bluebird((resolve, reject) => {
         //transfer.on('progress', (stats: any) =>
