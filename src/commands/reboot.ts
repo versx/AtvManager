@@ -1,5 +1,7 @@
 import { Message } from 'discord.js';
-import { AndroidDevice, AndroidDeviceService, DeviceHosts } from '../services';
+
+import DeviceHosts from '../devices.json';
+import { AndroidDevice, AndroidDeviceService } from '../services';
 import { Command } from '../types';
 
 //const service = new DeviceService(deviceHosts);
@@ -32,6 +34,10 @@ const command: Command = {
       } else {
         fails++;
       }
+    }
+
+    if (reboots === 0 && fails === 0) {
+      return;
     }
 
     console.log(devices.length, 'devices rebooted successfully.');

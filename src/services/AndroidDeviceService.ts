@@ -4,97 +4,10 @@ import { createWriteStream, existsSync, readFileSync } from 'fs';
 import { mkdir } from 'fs/promises';
 import { Readable } from 'stream';
 import { finished } from 'stream/promises';
+import path from 'node:path';
 
 const client = adb.createClient();
 const BasePath = '/data/local/tmp';
-
-// TODO: Pull from local file
-export const DeviceHosts = [
-  'atv01',
-  'atv02',
-  'atv03',
-  'atv04',
-  'atv05',
-  'atv06',
-  'atv07',
-  'atv08',
-  'atv09',
-  'atv10',
-  'atv11',
-  'atv12',
-  'atv13',
-  'atv14',
-  'atv15',
-  'atv16',
-  'atv17',
-  'atv18',
-  'atv19',
-  'atv20',
-  'atvRC01',
-  'atvUP01',
-  'atvON01',
-  'atvPO01',
-  'atvLL01',
-  'atvIR01',
-  'atvLF01',
-  'atvSG01',
-  'atvDTLA01',
-  'atvSA01',
-  'atvMV01',
-  'atvPA01',
-  'atvRSM01',
-  'atvELA01',
-  'atvCH01',
-  'atvNW01',
-  'atvAZ01',
-  'atvRL01',
-  'atvLO01',
-  'atvTO01',
-  'atvHH01',
-  'atvRH01',
-  'atvMF01',
-  'atvMF02',
-  'atvAL01',
-  'atvAR01',
-  'atvDU01',
-  'atvEM01',
-  'atvMO01',
-  'atvTC01',
-  'atvAH01',
-  'atvCM01',
-  'atvFV01',
-  'atvOR01',
-  'atvTU01',
-  'atvIR02',
-  'atvGG01',
-  'atvLF02',
-  'atvMV02',
-  'atvSA02',
-  'atvRC02',
-  'atvON02',
-  'atvUP02',
-  'atvSG02',
-  'atvRB01',
-  'atvRB02',
-  'atvTO02',
-  'atvDTLA02',
-  'atvWM01',
-  'atvCY01',
-  'atvIR03',
-  'atvLF03',
-  'atvRSM02',
-  'atvCL01',
-  'atvMPK01',
-  'atvFO01',
-  'atvSB01',
-  'atvRM01',
-  'atvCT01',
-  'atvGL01',
-  'atvWL01',
-  'atvCNA01',
-  'atvCNA02',
-  'atvCM02',
-];
 
 // Reference: https://github.com/DeviceFarmer/adbkit
 
@@ -216,7 +129,7 @@ export class AndroidDevice {
   async getScreenshot() {
     try {
       const source = BasePath + `/atlas.log`;
-      const destination = `./static/screens/${this.deviceHost}.png`;
+      const destination = path.resolve(__dirname, `./static/screens/${this.deviceHost}.png`);
       const screen = await this.deviceClient.screencap();
       await new Bluebird((resolve, reject) => {
         screen.on('error', reject);
@@ -239,7 +152,7 @@ export class AndroidDevice {
   async getLog() {
     try {
       const source = BasePath + `/atlas.log`;
-      const destination = `./static/logs/${this.deviceHost}.log`;
+      const destination = path.resolve(__dirname, `./static/logs/${this.deviceHost}.log`);
       const transfer = await this.deviceClient.pull(source);
       await new Bluebird((resolve, reject) => {
         //transfer.on('progress', (stats: any) =>
