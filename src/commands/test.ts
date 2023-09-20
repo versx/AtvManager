@@ -1,4 +1,5 @@
-import { AndroidDeviceService, DeviceHosts } from '../services';
+import DeviceHosts from '../devices.json';
+import { AndroidDeviceService } from '../services';
 import { Command } from '../types';
 
 const command: Command = {
