@@ -1,4 +1,4 @@
-import { AttachmentBuilder, Message } from 'discord.js';
+import { Message } from 'discord.js';
 
 import DeviceHosts from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
@@ -52,10 +52,9 @@ const screenshotDevice = async (device: AndroidDevice, message: Message) => {
       return;
     }
 
-    const file = new AttachmentBuilder(screenshot);
     await message.channel.send({
       content: `**Device Screenshot** (${device.deviceId})`,
-      files: [file],
+      files: [screenshot],
     });
 
     if (!await device.disconnect()) {
