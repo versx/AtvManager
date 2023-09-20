@@ -8,6 +8,10 @@ import path from 'node:path';
 
 const client = adb.createClient();
 const BasePath = '/data/local/tmp';
+const LocalBaseFolder = '../../static/';
+const ApksFolder = LocalBaseFolder + 'apks';
+const LogsFolder = LocalBaseFolder + 'logs';
+const ScreensFolder = LocalBaseFolder + 'screens';
 
 // Reference: https://github.com/DeviceFarmer/adbkit
 
@@ -67,8 +71,8 @@ export class AndroidDevice {
   async downloadFile(url: string, destination: string) {
     try {
       const response: any = await fetch(url);
-      if (!existsSync('../../static/apks')) {
-        await mkdir('../../static/apks');
+      if (!existsSync(ApksFolder)) {
+        await mkdir(ApksFolder);
       }
       const fileStream = createWriteStream(destination, { flags: 'wx' });
       await finished(Readable.fromWeb(response.body).pipe(fileStream));
@@ -80,7 +84,7 @@ export class AndroidDevice {
 
   async installApp(apkName: string = 'pogov7.apk') {
     try {
-      const apk = `../../static/apks/${apkName}`;
+      const apk = `${ApksFolder}/${apkName}`;
       if (!existsSync(apk)) {
         return false;
       }
@@ -129,17 +133,17 @@ export class AndroidDevice {
   async getScreenshot() {
     try {
       const source = BasePath + `/atlas.log`;
-      const destination = path.resolve(__dirname, `../../static/screens/${this.deviceHost}.png`);
+      const destination = path.resolve(__dirname, `${ScreensFolder}/${this.deviceHost}.png`);
       const screen = await this.deviceClient.screencap();
       await new Bluebird((resolve, reject) => {
         screen.on('error', reject);
         screen.on('data', (chunk: any) => {
           console.log(`[${this.deviceId}] Data ${chunk.length} bytes so far`);
         })
-        //screen.on('end', () => {
-        //  console.log(`[${this.deviceId}] Pull complete`);
-        //  resolve(this.deviceHost);
-        //});
+        screen.on('end', () => {
+          console.log(`[${this.deviceId}] Pull complete`);
+          resolve(this.deviceHost);
+        });
         screen.pipe(createWriteStream(destination));
       });
       console.log(`[${this.deviceId}] Pulled ${source} to ${destination}`);
@@ -152,7 +156,7 @@ export class AndroidDevice {
   async getLog() {
     try {
       const source = BasePath + `/atlas.log`;
-      const destination = path.resolve(__dirname, `../../static/logs/${this.deviceHost}.log`);
+      const destination = path.resolve(__dirname, `${LogsFolder}/${this.deviceHost}.log`);
       const transfer = await this.deviceClient.pull(source);
       await new Bluebird((resolve, reject) => {
         //transfer.on('progress', (stats: any) =>
