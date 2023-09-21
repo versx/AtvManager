@@ -8,18 +8,6 @@ import DeviceHosts from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { SlashCommand } from '../types';
 
-//const command: SlashCommand = {
-//  command: new SlashCommandBuilder()
-//    .setName('logs')
-//    .addStringOption(option =>
-//      option.setName('device')
-//        .setDescription('The name of the device to pull logs')
-//        .setRequired(true)
-//        .setAutocomplete(true)
-//      )
-//    .setDescription('Pull logs from a device')
-//  ,
-
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName('logs')
@@ -35,7 +23,7 @@ const command: SlashCommand = {
     )
     .addSubcommand(sub => sub
       .setName('clear')
-      .setDescription('Clear all logs for a device')
+      .setDescription('Clear all logs on a device')
       .addStringOption(option => option
         .setName('device')
         .setDescription('The name of the device to clear logs')
@@ -94,31 +82,6 @@ const command: SlashCommand = {
         default:
           return;
       }
-
-      //for (let i = 0; i < interaction.options.data.length; i++) {
-      //  const element = interaction.options.data[i];
-      //  if (element.name && element.value) {
-      //    options[element.name] = element.value;
-      //  }
-      //}
-
-      //console.log('options:', options);
-      //const { device } = options;
-      //if (!device) {
-      //  console.error('failed to get device from options');
-      //  return;
-      //}
-
-      //const service = new AndroidDeviceService([device?.toString()]);
-      //const atvDevice = service.devices.find(d => d.deviceHost === device);
-      //if (!atvDevice) {
-      //  return interaction.editReply({ content: `Failed to pull logs for device ${device}` });
-      //}
-
-      //const log = await pullDeviceLog(atvDevice);
-      //const title = `**Device Logs** (${device})\n------------------------------------\n`;
-      //const msg = log?.substring(0, Math.min(2000 - title.length - 6, (log?.length ?? 0) - title.length - 6));
-      //return await interaction.editReply({ content: title + '```' + msg + '```' });
     } catch (err) {
       console.error('execute:', err);
       return await interaction.editReply({ content: 'Something went wrong...' });
@@ -141,9 +104,11 @@ const pullDeviceLog = async (device: AndroidDevice) => {
       return `[${device.deviceId}] Failed to pull latest log file.`;
     }
 
-    // TODO: Return last 50 lines of log instead of top lines
     const title = `**Device Logs** (${device.deviceId})\n------------------------------------\n`;
-    const msg = data.substring(0, Math.min(2000 - title.length - 6, data.length - title.length - 6));
+    //const msg = data.substring(0, Math.min(2000 - title.length - 6, data.length - title.length - 6));
+    const msg = title.length + data.length > 2000
+      ? data.substring((title.length + data.length) - 2000 - 6)
+      : title + data;
 
     sleep(1500);
 
