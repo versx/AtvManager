@@ -25,7 +25,7 @@ const command: SlashCommand = {
     .setName('logs')
     .addSubcommand(sub => sub
       .setName('get')
-      .setDescription('Pull logs from a device2')
+      .setDescription('Pull logs from a device')
       .addStringOption(option => option
           .setName('device')
           .setDescription('The name of the device to pull logs')
@@ -49,11 +49,10 @@ const command: SlashCommand = {
     try {
       const focusedValue = interaction.options.getFocused();
       const choices = DeviceHosts.map(device => ({ name: device, value: device }));
-      let filtered: { name: string, value: string }[] = [];
+      const filtered: { name: string, value: string }[] = [];
       //const choices = DeviceHosts.splice(0, 75).map(device => ({ name: device, value: device }));
       //const filtered = choices.filter(choice => choice.name.startsWith(focusedValue));
-      for (let i = 0; i < choices.length; i++) {
-        const choice = choices[i];
+      for (const choice of choices) {
         if (choice.value.includes(focusedValue)) {
           filtered.push(choice);
         }
@@ -92,6 +91,8 @@ const command: SlashCommand = {
         case 'clear':
           const result = await deleteDeviceLogs(atvDevice);
           return await interaction.editReply({ content: result });
+        default:
+          return;
       }
 
       //for (let i = 0; i < interaction.options.data.length; i++) {

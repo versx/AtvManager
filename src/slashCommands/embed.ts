@@ -59,16 +59,16 @@ const command: SlashCommand = {
         { name: 'DarkGrey', value: 'DarkGrey' },
         { name: 'DarkerGrey', value: 'DarkerGrey' },
         { name: 'LightGrey', value: 'LightGrey' },
-        { name: 'DarkNavy', value: 'DarkNavy' }
+        { name: 'DarkNavy', value: 'DarkNavy' },
       ];
-      let filtered: { name: string, value: string }[] = []
+      let filtered: { name: string, value: string }[] = [];
       for (let i = 0; i < choices.length; i++) {
         const choice = choices[i];
-        if (choice.name.includes(focusedValue)) filtered.push(choice);
+        if (choice.name.includes(focusedValue)) {
+          filtered.push(choice);
+        }
       }
-      await interaction.respond(
-        filtered
-      );
+      await interaction.respond(filtered);
     } catch (error) {
       console.log(`Error: ${error.message}`)
     }

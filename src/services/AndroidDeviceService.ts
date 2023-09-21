@@ -132,21 +132,20 @@ export class AndroidDevice {
 
   async getScreenshot() {
     try {
-      const source = BasePath + `/atlas.log`;
       const destination = path.resolve(__dirname, `${ScreensFolder}/${this.deviceHost}.png`);
       const screen = await this.deviceClient.screencap();
       await new Bluebird((resolve, reject) => {
         screen.on('error', reject);
-        screen.on('data', (chunk: any) => {
-          console.log(`[${this.deviceId}] Data ${chunk.length} bytes so far`);
-        })
+        //screen.on('data', (chunk: any) => {
+        //  console.log(`[${this.deviceId}] Data ${chunk.length} bytes so far`);
+        //})
         screen.on('end', () => {
-          console.log(`[${this.deviceId}] Pull complete`);
+          console.log(`[${this.deviceId}] Pull screenshot complete`);
           resolve(this.deviceHost);
         });
         screen.pipe(createWriteStream(destination));
       });
-      console.log(`[${this.deviceId}] Pulled ${source} to ${destination}`);
+      console.log(`[${this.deviceId}] Pulled screenshot to ${destination}`);
       return destination;
     } catch (err) {
       console.error(`[${this.deviceId}] error:`, err.stack);
