@@ -71,6 +71,7 @@ const command: SlashCommand = {
           const result = await rebootDevice(device);
           await interaction.channel?.send({ content: result });
         }
+        return await interaction.channel?.send({ content: `${Object.keys(service.devices).length.toString()} devices rebooted` });
       }
     } catch (error) {
       return await interaction.editReply({ content: 'Something went wrong...' });
