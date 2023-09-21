@@ -173,14 +173,15 @@ export class AndroidDevice {
       const data = readFileSync(destination, { encoding: 'utf-8' });
       return data;
     } catch (err) {
-      console.error(`[${this.deviceId}] error:`, err.stack);
+      console.error(`[${this.deviceId}] error:`, err);
     }
   };
 
   async deleteLogs() {
     try {
       const cmd = `rm -rf ${BasePath}/*.log`;
-      this.deviceClient.shell(cmd);
+      const stream = await this.deviceClient.shell(cmd);
+      await adb.util.readAll(stream);
       console.log(`[${this.deviceId}] Deleted all logs in ${BasePath}`);
     } catch (err: any) {
       console.error(`[${this.deviceId}] error:`, err.stack);

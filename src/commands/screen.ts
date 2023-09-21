@@ -27,9 +27,7 @@ const command: Command = {
 
     const service = new AndroidDeviceService(devices);
     for (const device of service.devices) {
-      setTimeout(async () => {
-        await screenshotDevice(device, message);
-      }, 2 * 1000);
+      setTimeout(async () => await screenshotDevice(device, message), 2 * 1000);
     }
     //await service.kill();
   },

@@ -4,7 +4,6 @@ import DeviceHosts from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { Command } from '../types';
 
-//const service = new DeviceService(deviceHosts);
 const command: Command = {
   name: 'reboot',
   execute: async (message, args) => {

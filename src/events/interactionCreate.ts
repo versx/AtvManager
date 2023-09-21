@@ -30,7 +30,7 @@ const event: BotEvent = {
         return;
       }
       try {
-        if(!command.autocomplete) return;
+        if (!command.autocomplete) return;
         command.autocomplete(interaction);
       } catch (error) {
         console.error(error);
