@@ -5,21 +5,26 @@ import {
   SlashCommandBuilder,
 } from 'discord.js'
 
-import { Android, iPhone } from '../devices.json';
+import { Android } from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { SlashCommand } from '../types';
 
 const command: SlashCommand = {
   command: new SlashCommandBuilder()
-    .setName('screen')
+    .setName('shell')
     .addStringOption(option => option
-        .setName('device')
-        .setDescription('The name of the device to get a screenshot')
-        .setRequired(true)
-        .setAutocomplete(true)
-      )
-    .setDescription('Gets a screenshot of the device')
-    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
+      .setName('device')
+      .setDescription('The name of the device to execute the command on')
+      .setRequired(true)
+      .setAutocomplete(true)
+    )
+    .addStringOption(option => option
+      .setName('command')
+      .setDescription('The command to execute on the device')
+      .setRequired(true)
+    )
+    .setDescription('Executes a command on a specified device (Android Only)')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
   ,
   autocomplete: async (interaction: AutocompleteInteraction) => {
     try {
@@ -52,7 +57,7 @@ const command: SlashCommand = {
         }
       }
 
-      const { device } = options;
+      const { command, device } = options;
       const isAll = device.toString().toLowerCase() === 'all';
       const devices = isAll
         ? Android
@@ -61,25 +66,15 @@ const command: SlashCommand = {
       if (!isAll) {
         const atvDevice = service.devices.find(d => d.deviceHost === device);
         if (!atvDevice) {
-          return await interaction.editReply({ content: `Failed to get screenshot for device ${device}` });
+          return await interaction.editReply({ content: `Failed to get device ${device}` });
         }
 
-        setTimeout(async () => {
-          const screenshot = await screenshotDevice(atvDevice);
-          return await interaction.editReply({
-            content: `**Device Screenshot** (${atvDevice.deviceId})`,
-            files: [screenshot],
-          });
-        }, 2 * 1000);
+        const result = await shell(atvDevice, command.toString());
+        return await interaction.editReply({ content: `**Shell Result** (${atvDevice.deviceId})\n${result}` });
       } else {
         for (const device of service.devices) {
-          setTimeout(async () => {
-            const screenshot = await screenshotDevice(device);
-            await interaction.channel?.send({
-              content: `**Device Screenshot** (${device.deviceId})`,
-              files: [screenshot],
-            });
-          }, 2 * 1000);
+          const result = await shell(device, command.toString());
+          await interaction.channel?.send({ content: `**Shell Result** (${device.deviceId})\n${result}` });
         }
       }
     } catch (error) {
@@ -89,25 +84,27 @@ const command: SlashCommand = {
   cooldown: 10,
 };
 
-const screenshotDevice = async (device: AndroidDevice) => {
+const shell = async (device: AndroidDevice, command: string) => {
   try {
     if (!await device.connect()) {
       console.log(`[${device.deviceId}] Connection failed`);
       return `[${device.deviceId}] Connection failed`;
     }
 
-    const screenshot = await device.getScreenshot();
-    if (!screenshot) {
-      console.warn('Failed to get screenshot for device', device.deviceId);
-      return `Failed to get screenshot for device ${device.deviceId}`;
+    const response = await device.shell(command);
+    if (!response) {
+      return `[${device.deviceId}] Failed to execute shell command, response: ${response}`;
     }
+
+    const title = `**Shell Response** (${device.deviceId})\n`;
+    const msg = response.substring(0, Math.min(2000 - title.length - 6, response.length - title.length - 6));
 
     if (!await device.disconnect()) {
       console.log(`[${device.deviceId}] Failed to disconnect`);
       return `[${device.deviceId}] Failed to disconnect`;
     }
 
-    return screenshot;
+    return title + '```' + msg + '```';
   } catch (err: any) {
     console.error('error:', err.message);
     return `[${device.deviceId}] Failed connection`;

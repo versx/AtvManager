@@ -1,5 +1,12 @@
-[
-  "atv01",
-  "atv02",
-  "atv03"
-]
+{
+  "Android": [
+    "atv01",
+    "atv02",
+    "atv03"
+  ],
+  "iPhone": [
+    "1SE",
+    "2SE",
+    "3SE"
+  ]
+}

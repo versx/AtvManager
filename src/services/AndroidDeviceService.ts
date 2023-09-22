@@ -1,5 +1,4 @@
 import adb, { DeviceClient } from '@devicefarmer/adbkit';
-import Bluebird from 'bluebird';
 import { createWriteStream, existsSync, readFileSync } from 'fs';
 import { mkdir } from 'fs/promises';
 import { Readable } from 'stream';
@@ -134,7 +133,7 @@ export class AndroidDevice {
     try {
       const destination = path.resolve(__dirname, `${ScreensFolder}/${this.deviceHost}.png`);
       const screen = await this.deviceClient.screencap();
-      await new Bluebird((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         screen.on('error', reject);
         //screen.on('data', (chunk: any) => {
         //  console.log(`[${this.deviceId}] Data ${chunk.length} bytes so far`);
@@ -157,7 +156,7 @@ export class AndroidDevice {
       const source = BasePath + `/atlas.log`;
       const destination = path.resolve(__dirname, `${LogsFolder}/${this.deviceHost}.log`);
       const transfer = await this.deviceClient.pull(source);
-      await new Bluebird((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         //transfer.on('progress', (stats: any) =>
         //  console.log(`[${this.deviceId}] Pulled ${stats.bytesTransferred} bytes so far`),
         //);
@@ -237,7 +236,7 @@ export class AndroidDevice {
 };
 
 const serviceByName = (name: string) => {
-  switch (name) {
+  switch (name.toLowerCase()) {
     case 'atlas':
     case 'pogo':
       return 'com.pokemod.atlas/com.pokemod.atlas.services.MappingService';

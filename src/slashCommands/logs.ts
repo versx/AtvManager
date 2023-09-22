@@ -1,10 +1,11 @@
 import {
   AutocompleteInteraction,
   ChatInputCommandInteraction,
+  PermissionFlagsBits,
   SlashCommandBuilder,
 } from 'discord.js'
 
-import DeviceHosts from '../devices.json';
+import { Android, iPhone } from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { SlashCommand } from '../types';
 
@@ -31,12 +32,13 @@ const command: SlashCommand = {
         .setAutocomplete(true)
       )
     )
-    .setDescription('Device log commands')
+    .setDescription('Device log commands (Android Only)')
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
   ,
   autocomplete: async (interaction: AutocompleteInteraction) => {
     try {
       const focusedValue = interaction.options.getFocused();
-      const choices = DeviceHosts.map(device => ({ name: device, value: device }));
+      const choices = [...Android, ...iPhone].map(device => ({ name: device, value: device }));
       const filtered: { name: string, value: string }[] = [];
       for (const choice of choices) {
         if (choice.value.includes(focusedValue)) {
