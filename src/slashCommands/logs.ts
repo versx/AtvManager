@@ -38,8 +38,6 @@ const command: SlashCommand = {
       const focusedValue = interaction.options.getFocused();
       const choices = DeviceHosts.map(device => ({ name: device, value: device }));
       const filtered: { name: string, value: string }[] = [];
-      //const choices = DeviceHosts.splice(0, 75).map(device => ({ name: device, value: device }));
-      //const filtered = choices.filter(choice => choice.name.startsWith(focusedValue));
       for (const choice of choices) {
         if (choice.value.includes(focusedValue)) {
           filtered.push(choice);
