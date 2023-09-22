@@ -117,7 +117,7 @@ const command: SlashCommand = {
               await rebootPhone(device.toString());
             } else {
               for (const device of iPhone) {
-                await rebootPhone(device);
+                setTimeout(async () => await rebootPhone(device), 2 * 1000);
               }
             }
           }
