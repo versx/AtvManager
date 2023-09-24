@@ -49,15 +49,14 @@ const command: Command = {
         setTimeout(async () => {
           try {
             const result = await rebootPhone(device);
-            if (result) {
-              await message.channel.send({ content: `[${device}] Rebooted successfully` });
-            } else {
-              await message.channel.send({ content: `[${device}] Failed to reboot` });
-            }
+            const content = result
+              ? `[${device}] Rebooted successfully`
+              : `[${device}] Failed to reboot`;
+            await message.channel.send({ content });
           } catch (err) {
-            console.error(err);
+            console.error(`[${device}] ${err}`);
           }
-        }, 2 * 1000);
+        }, 1 * 1000);
       }
     }
 
@@ -111,34 +110,53 @@ const rebootDevice = async (device: AndroidDevice, message: Message): Promise<bo
 
 const rebootPhone = async (name: string): Promise<boolean> => {
   for (const url of config.discord.agentUrls) {
-    const response = await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'restart',
-        device: name,
-      }),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      console.warn('error:', response);
-      //return false;
-      continue;
-    }
-  
-    let body;
     try {
+      const response = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          type: 'restart',
+          device: name,
+        }),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        timeout: 5 * 1000,
+      });
+      if (!response.ok) {
+        console.warn('error:', response);
+        //return false;
+        continue;
+      }
+  
+      let body;
       body = await response.json();
       const result = body.status === 'ok';
       console.log('body:', body, 'result:', result);
-      return result;
+      if (result) {
+        return true;
+      }
     } catch (err) {
       console.error(err);
     }
   }
   return false;
+};
+
+interface RequestOptions extends RequestInit {
+  timeout: number;
+};
+
+const fetchWithTimeout = async (url: string, options: RequestOptions) => {
+  const { timeout = 8000 } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  const response = await fetch(url, {
+    ...options,
+    signal: controller.signal,
+  });
+  clearTimeout(id);
+  return response;
 };
 
 export default command;
