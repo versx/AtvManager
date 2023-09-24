@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 
+import config from '../config.json';
 import { Android, iPhone } from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { Command } from '../types';
@@ -10,15 +11,23 @@ const command: Command = {
     //console.log('message:', message, 'args:', args);
     if (!message.guild) return;
 
-    const arg = args[1];
+    const type = args[1];
+    if (!type) {
+      await message.channel.send(`Must specify device type, i.e. 'Android' or 'iPhone'`);
+      return;
+    }
+
+    const arg = args[2];
     if (!arg) {
       await message.channel.send(`Device not found '${arg}'`);
       return;
     }
 
+    const isAndroid = type.toLowerCase() === 'android';
+
     let devices: string[] = [];
     if (arg === 'all') {
-      devices = Android;
+      devices = isAndroid ? Android : iPhone;
     } else if (arg.includes(',')) {
       devices = arg.split(/,\s?/g);
     } else {
@@ -26,12 +35,25 @@ const command: Command = {
     }
 
     let reboots = 0, fails = 0;
-    const service = new AndroidDeviceService(devices);
-    for (const device of service.devices) {
-      if (await rebootDevice(device, message)) {
-        reboots++;
-      } else {
-        fails++;
+    if (isAndroid) {
+      const service = new AndroidDeviceService(devices);
+      for (const device of service.devices) {
+        if (await rebootDevice(device, message)) {
+          reboots++;
+        } else {
+          fails++;
+        }
+      }
+    } else {
+      for (const device of devices) {
+        setTimeout(async () => {
+          const result = await rebootPhone(device);
+          if (result) {
+            await message.channel.send({ content: `[${device}] Rebooted successfully` });
+          } else {
+            await message.channel.send({ content: `[${device}] Failed to reboot` });
+          }
+        }, 2 * 1000);
       }
     }
 
@@ -81,6 +103,37 @@ const rebootDevice = async (device: AndroidDevice, message: Message): Promise<bo
     await message.channel.send(`[${device.deviceId}] Failed connection`);
     return false;
   }
+};
+
+const rebootPhone = async (name: string): Promise<boolean> => {
+  for (const url of config.discord.agentUrls) {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'restart',
+        device: name,
+      }),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.warn('error:', response);
+      return false;
+    }
+  
+    let body;
+    try {
+      body = await response.json();
+      const result = body.status === 'ok';
+      console.log('body:', body, 'result:', result);
+      return result;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  return false;
 };
 
 export default command;
