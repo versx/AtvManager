@@ -47,11 +47,15 @@ const command: Command = {
     } else {
       for (const device of devices) {
         setTimeout(async () => {
-          const result = await rebootPhone(device);
-          if (result) {
-            await message.channel.send({ content: `[${device}] Rebooted successfully` });
-          } else {
-            await message.channel.send({ content: `[${device}] Failed to reboot` });
+          try {
+            const result = await rebootPhone(device);
+            if (result) {
+              await message.channel.send({ content: `[${device}] Rebooted successfully` });
+            } else {
+              await message.channel.send({ content: `[${device}] Failed to reboot` });
+            }
+          } catch (err) {
+            console.error(err);
           }
         }, 2 * 1000);
       }
@@ -129,7 +133,7 @@ const rebootPhone = async (name: string): Promise<boolean> => {
       body = await response.json();
       const result = body.status === 'ok';
       console.log('body:', body, 'result:', result);
-      //return result;
+      return result;
     } catch (err) {
       console.error(err);
     }
