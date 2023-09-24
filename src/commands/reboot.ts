@@ -120,7 +120,8 @@ const rebootPhone = async (name: string): Promise<boolean> => {
     });
     if (!response.ok) {
       console.warn('error:', response);
-      return false;
+      //return false;
+      continue;
     }
   
     let body;
@@ -128,7 +129,7 @@ const rebootPhone = async (name: string): Promise<boolean> => {
       body = await response.json();
       const result = body.status === 'ok';
       console.log('body:', body, 'result:', result);
-      return result;
+      //return result;
     } catch (err) {
       console.error(err);
     }
