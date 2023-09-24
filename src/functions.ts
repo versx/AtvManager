@@ -45,3 +45,5 @@ export const sendTimedMessage = (message: string, channel: TextChannel, duration
     .then(m => setTimeout(async () => (await channel.messages.fetch(m)).delete(), duration));
   return;
 };
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

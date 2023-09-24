@@ -6,6 +6,7 @@ import {
 } from 'discord.js'
 
 import { Android, iPhone } from '../devices.json';
+import { sleep } from '../functions';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { SlashCommand } from '../types';
 
@@ -147,7 +148,5 @@ const deleteDeviceLogs = async (device: AndroidDevice) => {
     return `[${device.deviceId}] Failed connection`;
   }
 };
-
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default command;
