@@ -49,6 +49,11 @@ const command: Command = {
         setTimeout(async () => {
           try {
             const result = await rebootPhone(device);
+            if (result) {
+              reboots++;
+            } else {
+              fails++;
+            }
             const content = result
               ? `[${device}] Rebooted successfully`
               : `[${device}] Failed to reboot`;
