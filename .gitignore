@@ -3,4 +3,5 @@ build
 .env
 .vscode
 static
+config.json
 devices.json

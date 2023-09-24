@@ -1,11 +1,9 @@
-import dotenv from 'dotenv';
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 
+import config from './config.json';
 import { Command, SlashCommand } from './types';
-
-dotenv.config({ path: __dirname + '/.env' });
 
 const { Guilds, MessageContent, GuildMessages, GuildMembers } = GatewayIntentBits;
 const client = new Client({intents:[Guilds, MessageContent, GuildMessages, GuildMembers]});
@@ -22,4 +20,4 @@ readdirSync(handlersDir).forEach((handler: string) => {
   require(`${handlersDir}/${handler}`)(client);
 });
 
-client.login(process.env.TOKEN);
+client.login(config.discord.token);

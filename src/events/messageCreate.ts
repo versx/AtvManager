@@ -1,5 +1,6 @@
 import { ChannelType, Message } from 'discord.js';
 
+import config from '../config.json';
 import { checkPermissions, sendTimedMessage } from '../functions';
 import { BotEvent } from '../types';
 
@@ -8,7 +9,7 @@ const event: BotEvent = {
   execute: async (message: Message) => {
     if (!message.member || message.member.user.bot) return;
     if (!message.guild) return;
-    let prefix = process.env.PREFIX;
+    const prefix = config.discord.prefix;
 
     if (!message.content.startsWith(prefix)) return;
     if (message.channel.type !== ChannelType.GuildText) return;

@@ -1,3 +1,5 @@
+import config from '../config.json';
+
 // TODO: iPhoneDeviceService
 
 export class iPhoneDeviceService {
@@ -24,31 +26,32 @@ export class iPhoneDevice {
   }
 
   async reboot() {
-    const url = process.env.AGENT_URL?.toString();
-    const response = await fetch(url!, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'restart',
-        device: name,
-      }),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      console.warn('error:', response);
-      return false;
-    }
-  
-    let body;
-    try {
-      body = await response.json();
-      const result = body.status === 'ok';
-      console.log('body:', body, 'result:', result);
-      return result;
-    } catch (err) {
-      console.error(err);
+    for (const url of config.discord.agentUrls) {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          type: 'restart',
+          device: name,
+        }),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        console.warn('error:', response);
+        return false;
+      }
+    
+      let body;
+      try {
+        body = await response.json();
+        const result = body.status === 'ok';
+        console.log('body:', body, 'result:', result);
+        return result;
+      } catch (err) {
+        console.error(err);
+      }
     }
     return false;
   }

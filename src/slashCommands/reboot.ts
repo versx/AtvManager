@@ -3,9 +3,9 @@ import {
   ChatInputCommandInteraction,
   PermissionFlagsBits,
   SlashCommandBuilder,
-  TextChannel,
 } from 'discord.js'
 
+import config from '../config.json';
 import { Android, iPhone } from '../devices.json';
 import { AndroidDevice, AndroidDeviceService } from '../services';
 import { SlashCommand } from '../types';
@@ -166,31 +166,32 @@ const rebootDevice = async (device: AndroidDevice): Promise<string> => {
 };
 
 const rebootPhone = async (name: string): Promise<boolean> => {
-  const url = process.env.AGENT_URL?.toString();
-  const response = await fetch(url!, {
-    method: 'POST',
-    body: JSON.stringify({
-      type: 'restart',
-      device: name,
-    }),
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-  });
-  if (!response.ok) {
-    console.warn('error:', response);
-    return false;
-  }
-
-  let body;
-  try {
-    body = await response.json();
-    const result = body.status === 'ok';
-    console.log('body:', body, 'result:', result);
-    return result;
-  } catch (err) {
-    console.error(err);
+  for (const url of config.discord.agentUrls) {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'restart',
+        device: name,
+      }),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.warn('error:', response);
+      return false;
+    }
+  
+    let body;
+    try {
+      body = await response.json();
+      const result = body.status === 'ok';
+      console.log('body:', body, 'result:', result);
+      return result;
+    } catch (err) {
+      console.error(err);
+    }
   }
   return false;
 };

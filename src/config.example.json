@@ -1,0 +1,8 @@
+{
+  "discord": {
+    "token": "<DISCORD_BOT_TOKEN>",
+    "clientId": "<DISCORD_BOT_CLIENT_ID>",
+    "prefix": "!",
+    "agentUrls": []
+  }
+}

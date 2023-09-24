@@ -3,6 +3,7 @@ import { REST } from '@discordjs/rest'
 import { readdirSync } from 'fs';
 import { join } from 'path';
 
+import config from '../config.json';
 import { color } from '../functions';
 import { Command, SlashCommand } from '../types';
 
@@ -31,8 +32,8 @@ module.exports = (client: Client) => {
     client.commands.set(command.name, command);
   });
 
-  const rest = new REST({version: '10'}).setToken(process.env.TOKEN);
-  rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+  const rest = new REST({version: '10'}).setToken(config.discord.token);
+  rest.put(Routes.applicationCommands(config.discord.clientId), {
     body: slashCommands.map(command => command.toJSON()),
   })
   .then((data: any) => {
