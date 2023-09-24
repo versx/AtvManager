@@ -94,7 +94,7 @@ const command: SlashCommand = {
             } else {
               for (const device of service.devices) {
                 const result = await rebootDevice(device);
-                await (interaction.channel as TextChannel)?.send({ content: result });
+                await interaction.channel?.send({ content: result });
               }
 
               //if (reboots === 0 && fails === 0) {
@@ -108,7 +108,8 @@ const command: SlashCommand = {
               //  await interaction.channel?.send(`${reboots} devices rebooted successfully.`);
               //}
 
-              return await (interaction.channel as TextChannel)?.send({ content: `${Object.keys(service.devices).length.toLocaleString()} devices rebooted` });
+              //return await (interaction.channel as TextChannel)?.send({ content: `${Object.keys(service.devices).length.toLocaleString()} devices rebooted` });
+              await interaction.editReply({ content: `Rebooted ${service.devices.length.toLocaleString()} Android devices` });
             }
           }
         case 'iPhone':
@@ -117,8 +118,16 @@ const command: SlashCommand = {
               await rebootPhone(device.toString());
             } else {
               for (const device of iPhone) {
-                setTimeout(async () => await rebootPhone(device), 2 * 1000);
+                setTimeout(async () => {
+                  const result = await rebootPhone(device);
+                  if (result) {
+                    await interaction.channel?.send({ content: `[${device}] Rebooted successfully` });
+                  } else {
+                    //await interaction.channel?.send({ content: `[${device}] Failed to reboot` });
+                  }
+                }, 2 * 1000);
               }
+              await interaction.editReply({ content: `Rebooted ${iPhone.length.toLocaleString()} iPhone devices` });
             }
           }
           break;
@@ -156,9 +165,9 @@ const rebootDevice = async (device: AndroidDevice): Promise<string> => {
   }
 };
 
-const rebootPhone = async (name: string) => {
+const rebootPhone = async (name: string): Promise<boolean> => {
   const url = process.env.AGENT_URL?.toString();
-  await fetch(url!, {
+  const response = await fetch(url!, {
     method: 'POST',
     body: JSON.stringify({
       type: 'restart',
@@ -169,6 +178,21 @@ const rebootPhone = async (name: string) => {
       'Content-Type': 'application/json',
     },
   });
+  if (!response.ok) {
+    console.warn('error:', response);
+    return false;
+  }
+
+  let body;
+  try {
+    body = await response.json();
+    const result = body.status === 'ok';
+    console.log('body:', body, 'result:', result);
+    return result;
+  } catch (err) {
+    console.error(err);
+  }
+  return false;
 };
 
 export default command;
